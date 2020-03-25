@@ -1,5 +1,6 @@
 from Crypto.Cipher import AES
 from Crypto import Random
+import os, struct
 
 
 def encryption(in_file, enType, out_file = None, chunksize = 24*1024):
@@ -31,10 +32,12 @@ def decryption(in_file, enType, out_file = None, chunksize = 24*1024):
     key = b"sixteen byte pas"
 
     if out_file == None:
-        out_file = in_file + ".enc"
+        out_file = "dec_" + os.path.splitext(in_file)[0]
 
     with open(in_file, "rb") as in_file:
         with open(out_file, "wb") as out_file:
+
+            origsize = struct.unpack('<Q', in_file.read(struct.calcsize('Q')))[0]
 
             if enType == 1:
                 iv = in_file.read(16)
@@ -44,6 +47,7 @@ def decryption(in_file, enType, out_file = None, chunksize = 24*1024):
                     if len(chunk) == 0:
                         break
                     out_file.write(cipher.encrypt(chunk))
+                out_file.truncate(origsize)
 
             elif enType == 2:
                 print("to be continued...")
