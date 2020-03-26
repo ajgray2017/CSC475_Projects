@@ -37,7 +37,7 @@ def decryption(in_file, enType, out_file = None, chunksize = 24*1024):
     with open(in_file, "rb") as in_file:
         with open(out_file, "wb") as out_file:
 
-            origsize = struct.unpack('<Q', in_file.read(struct.calcsize('Q')))[0]
+            #origsize = struct.unpack('<Q', in_file.read(struct.calcsize('Q')))[0]
 
             if enType == 1:
                 iv = in_file.read(16)
