@@ -1,69 +1,83 @@
+import os
 from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
 from Crypto import Random
-import os, struct
 
-def encryption(key, in_file, enType, out_file = None, chunksize = 24*1024):
-    if out_file == None:
-        out_file = in_file + ".enc"
+def AESencrypt(key, filename):
+    chunksize = 64 * 1024
+    outputFile = filename + ".enc"
+    filesize = str(os.path.getsize(filename)).zfill(16)
+    IV = Random.new().read(16)
 
-    with open(in_file, "rb") as in_file:
-        with open(out_file, "wb") as out_file:
+    encryptor = AES.new(key, AES.MODE_CBC, IV)
 
-            if enType == 1:
-                iv = Random.new().read(AES.block_size)
-                cipher = AES.new(key, AES.MODE_CFB, iv)
+    with open(filename, "rb") as infile:
+        with open(outputFile, "wb") as outfile:
+            outfile.write(filesize.encode("utf-8"))
+            outfile.write(IV)
 
-                while True:
-                    chunk = in_file.read(chunksize)
-                    if len(chunk) == 0:
-                        break
-                    elif len(chunk) % 16 != 0:
-                        chunk += b" " * (16 - len(chunk) % 16)
+            while True:
+                chunk = infile.read(chunksize)
 
-                    out_file.write(cipher.encrypt(chunk))
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b" " * (16 - (len(chunk) % 16))
 
-            elif enType == 2:
-                pass
+                outfile.write(encryptor.encrypt(chunk))
 
-            elif enType == 3:
-                pass
 
-def decryption(key, in_file, enType, out_file = None, chunksize = 24*1024):
+def AESdecrypt(key, filename):
+    chunksize = 64 * 1024
+    outputFile = "decrypted_" + os.path.splitext(filename)[0]
 
-    if out_file == None:
-        out_file = "dec_" + os.path.splitext(in_file)[0]
+    with open(filename, "rb") as infile:
+        filesize = int(infile.read(16))
+        IV = infile.read(16)
 
-    with open(in_file, "rb") as in_file:
-        with open(out_file, "wb") as out_file:
+        decryptor = AES.new(key, AES.MODE_CBC, IV)
 
-            #origsize = struct.unpack('<Q', in_file.read(struct.calcsize('Q')))[0]
+        with open(outputFile, "wb") as outfile:
+            while True:
+                chunk = infile.read(chunksize)
 
-            if enType == 1:
-                iv = in_file.read(16)
-                cipher = AES.new(key, AES.MODE_CFB, iv)
-                while True:
-                    chunk = in_file.read(chunksize)
-                    if len(chunk) == 0:
-                        break
-                    out_file.write(cipher.encrypt(chunk))
-                out_file.truncate(origsize)
+                if len(chunk) == 0:
+                    break
 
-            elif enType == 2:
-                print("to be continued...")
-            elif enType == 3:
-                print("to be continued...")
+                outfile.write(decryptor.decrypt(chunk))
+                outfile.truncate(filesize)
+
+
+def getKey(password):
+    hasher = SHA256.new(password.encode("utf-8"))
+    return hasher.digest()
+
 
 def main():
-    in_file = input("Type in the path of the file to be encrypted/decrypted: ")
-    eord = int(input("press 1 for encryption or 2 for decryption: "))
-    usr_select = int(input("Select 1 for AES, 2 for DES, 3 for DES: "))
-    #key = input("Input key: ")
-    key = b"this_is_a_key"
 
-    if eord == 1:
-        encryption(key, in_file, usr_select)
-    elif eord == 2:
-        decryption(key, in_file, usr_select)
+    choice = input("Would you like to (E)ncrypt or (D)ecrypt?: ")
+    en_type = input("Choose method: (1) AES, (2) DES, (3) 3DES")
+
+    if choice.lower() == "e":
+        filename = input("File to encrypt: ")
+        password = input("Password: ")
+        if en_type == 1:
+            AESencrypt(getKey(password), filename)
+        if en_type == 2:
+            DESencrypt(getKey(password), filename)
+        if en_type == 3:
+            TDESencrypt(getKey(password), filename)
+
+    elif choice.lower() == "d":
+        filename = input("File to decrypt: ")
+        password = input("Password: ")
+        if en_type == 1:
+            AESdecrypt(getKey(password), filename)
+        if en_type == 2:
+            DESdecrypt(getKey(password), filename)
+        if en_type == 3:
+            TDESdecrypt(getKey(password), filename)
+
 
 if __name__ == "__main__":
     main()
