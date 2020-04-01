@@ -1,6 +1,7 @@
 import os
 
 def encrypt(filename, cipher, IV, byteSize, enType):
+    #! dynamic chunksize?
     chunksize = 64 * 1024
     outputFile = enType + "_" + filename + ".enc"
     filesize = str(os.path.getsize(filename)).zfill(byteSize)
@@ -21,6 +22,7 @@ def encrypt(filename, cipher, IV, byteSize, enType):
                 outfile.write(cipher.encrypt(chunk))
 
 def decrypt(filename, cipher, IV, byteSize):
+    #! dynamic chunksize?
     chunksize = 64 * 1024
     outputFile = "decrypted_" + os.path.splitext(filename)[0]
 
@@ -47,10 +49,12 @@ def getKey(password):
 def main():
     from Crypto import Random
 
+    #user inputs 
     choice = input("Would you like to (E)ncrypt or (D)ecrypt?: ")
     enType = int(input("Choose method: (1) AES, (2) DES, (3) 3DES: "))
     password = input("Password: ")
 
+    #AES encryption option
     if enType == 1:
         from Crypto.Cipher import AES
 
@@ -59,14 +63,18 @@ def main():
         IV = Random.new().read(byteSize)
         cipher = AES.new(getKey(password), AES.MODE_CBC, IV)
 
+    #DES encryption option
     elif enType == 2:
         from Crypto.Cipher import DES
 
         enType = "DES"
         byteSize = 8
         IV = Random.new().read(byteSize)
+        #! Figure out dynamic key
         cipher = DES.new(b"-8B key-", DES.MODE_CBC, IV)
-
+    
+    #3DES encryption option 
+    #! Broken, needs to run three times
     elif enType == 3:
         from Crypto.Cipher import DES3
 
