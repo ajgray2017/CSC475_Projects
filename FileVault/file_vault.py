@@ -1,7 +1,6 @@
 import os
 
 def encrypt(filename, cipher, IV, byteSize, enType):
-    #! dynamic chunksize?
     chunksize = 64 * 1024
     outputFile = enType + "_" + filename + ".enc"
     filesize = str(os.path.getsize(filename)).zfill(byteSize)
@@ -22,7 +21,6 @@ def encrypt(filename, cipher, IV, byteSize, enType):
                 outfile.write(cipher.encrypt(chunk))
 
 def decrypt(filename, cipher, IV, byteSize):
-    #! dynamic chunksize?
     chunksize = 64 * 1024
     outputFile = "decrypted_" + os.path.splitext(filename)[0]
 
@@ -104,4 +102,6 @@ def main():
         print("Done decrpyting")
 
 if __name__ == "__main__":
-    main()
+    #! REMOVE 
+    while True:
+        main()
