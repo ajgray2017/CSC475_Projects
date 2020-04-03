@@ -1,8 +1,9 @@
 import smtplib, ssl
+import getpass
 
 # choosing the smtp port
 port = 465 
-pswrd = input("Gmail Password: ")
+pswrd = getpass.getpass()       # getpass function that will get the password w/o showing it
 dummy_file = input("What file did you want to generate an email from? ")
 
 # Create SSL context
