@@ -35,7 +35,7 @@ def decrypt(filename, cipher, IV, byteSize):
                 if len(chunk) == 0:
                     break
 
-                outfile.write(cipher.decrypt(chunk))
+                outfile.write(cipher.decrypt(chunk) - IV)
                 outfile.truncate(filesize)
 
 def getKey(password):
@@ -72,21 +72,13 @@ def main():
         cipher = DES.new(b"-8B key-", DES.MODE_CBC, IV)
     
     #3DES encryption option 
-    #! Broken, needs to run three times
     elif enType == 3:
         from Crypto.Cipher import DES3
 
         enType = "3DES"
         byteSize = 8
         IV = Random.new().read(byteSize)
-
-        while True:
-            try:
-                key = DES3.adjust_key_parity(Random.get_random_bytes(24))
-                break
-            except ValueError:
-                pass
-        cipher = DES3.new(key, DES3.MODE_CFB, IV)
+        cipher = DES3.new(b'Sixteen byte key', DES3.MODE_CTR, IV)
 
     else:
         print("Incorrect selection")
@@ -100,6 +92,9 @@ def main():
         filename = input("File to decrypt: ")
         decrypt(filename, cipher, IV, byteSize)
         print("Done decrypting")
+        
+    else:
+        print("Incorrect selection")
 
 if __name__ == "__main__":
     #! REMOVE 
