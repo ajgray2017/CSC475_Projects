@@ -35,7 +35,7 @@ def decrypt(filename, cipher, IV, byteSize):
                 if len(chunk) == 0:
                     break
 
-                outfile.write(cipher.decrypt(chunk) - IV)
+                outfile.write(cipher.decrypt(chunk))
                 outfile.truncate(filesize)
 
 def getKey(password):
@@ -78,7 +78,7 @@ def main():
         enType = "3DES"
         byteSize = 8
         IV = Random.new().read(byteSize)
-        cipher = DES3.new(b'Sixteen byte key', DES3.MODE_CTR, IV)
+        cipher = DES3.new(b'Sixteen byte key', DES3.MODE_EAX, IV)
 
     else:
         print("Incorrect selection")
