@@ -46,6 +46,7 @@ def getKey(password):
 
 def main():
     from Crypto import Random
+    import time as t
 
     #user inputs 
     choice = input("Would you like to (E)ncrypt or (D)ecrypt?: ")
@@ -68,7 +69,6 @@ def main():
         enType = "DES"
         byteSize = 8
         IV = Random.new().read(byteSize)
-        #! Figure out dynamic key
         cipher = DES.new(b"-8B key-", DES.MODE_CBC, IV)
     
     #3DES encryption option 
@@ -78,20 +78,24 @@ def main():
         enType = "3DES"
         byteSize = 8
         IV = Random.new().read(byteSize)
-        cipher = DES3.new(b'Sixteen byte key', DES3.MODE_EAX, IV)
+        cipher = DES3.new(b'Sixteen byte key', DES3.MODE_CBC, IV)
 
     else:
         print("Incorrect selection")
 
     if choice.lower() == "e":
         filename = input("File to encrypt: ")
+        start = t.perf_counter()
         encrypt(filename, cipher, IV, byteSize, enType)
-        print("Done encrpyting")
+        end = t.perf_counter()
+        print(f"Done encrpyting, time taken = {end - start}")
 
     elif choice.lower() == "d":
         filename = input("File to decrypt: ")
+        start = t.perf_counter()
         decrypt(filename, cipher, IV, byteSize)
-        print("Done decrypting")
+        end = t.perf_counter()
+        print(f"Done decrypting, time taken = {end - start}")
         
     else:
         print("Incorrect selection")
