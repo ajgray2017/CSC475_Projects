@@ -26,3 +26,4 @@ with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
     server.login(sender_email, pswrd)
     print("Sending messages")
     server.sendmail(sender_email, receiver_email, message)
+    
