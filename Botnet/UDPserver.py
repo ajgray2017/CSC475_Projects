@@ -1,19 +1,32 @@
 from socket import *
-serverPort = 12000
-serverSocket = socket(AF_INET, SOCK_DGRAM)
-serverSocket.bind(('', serverPort))
+import pickle
+import smtp
 
-print('The server is ready to destroy your enemies and get arrested for wire fraud')
-while True:
-    print("waiting...")
-    message, clientAddress = serverSocket.recvfrom(2048)
+def main():
+    serverPort = 12000
+    server = socket(AF_INET, SOCK_DGRAM)
+    server.bind(('', serverPort))
 
-    print(message)
+    sender_email = "hellotest001smtp@gmail.com"
+    receiver_email = "hellotest002smtp@gmail.com"
+    testFile = "email_body.txt"
+    password = "csc475assignment"
 
-    # sender_email = input("Sender Email.. ")
-    # receiver_email = input("Receiver Email.. ")
-    # dummy_file = input("File.. ")
+    print('The server is ready to destroy your enemies and get arrested for wire fraud')
 
-    lst = ["hellotest002smtp@gmail.com", "hellotest001smtp@gmail.com", "email_body.txt"]
+    while True:
+        input("Start Server? ")
+        message, clientAddress = server.recvfrom(2048)
+        print(message.decode())
 
-    serverSocket.sendto(lst.encode(), clientAddress)
+        virus = smtp.SMTP(sender_email, receiver_email, password)
+
+        payload = pickle.dumps(virus)
+
+        server.sendto(payload, clientAddress)
+
+        # message, clientAddress = server.recvfrom(2048)
+        # print(message.decode())
+
+if __name__ == "__main__":
+    main()
