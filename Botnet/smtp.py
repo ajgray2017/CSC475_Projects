@@ -28,7 +28,7 @@ class SMTP:
         message.attach(MIMEText(self.contents, 'plain'))
 
         try:
-            attachedFile = open(getPayload(), 'rb')
+            attachedFile = open(self.getPayload(), 'rb')
         except:
             #Todo Add in send back to server error, reinput file
             print("could not find file.. Try again.")
