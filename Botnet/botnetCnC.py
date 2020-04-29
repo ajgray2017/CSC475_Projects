@@ -7,16 +7,27 @@ import smtp
 def newSlave(server, clientAddress, info):
 
     # todo remake in TCP so slaves can be held
+    try:
+        virus = smtp.SMTP(info[0], info[1], info[2], info[3], info[4], info[5])
 
-    virus = smtp.SMTP(info[0], info[1], info[2], info[3], info[4], info[5])
+        payload = pickle.dumps(virus)
 
-    payload = pickle.dumps(virus)
+        server.sendto(payload, clientAddress)
 
-    server.sendto(payload, clientAddress)
+        message, clientAddress = server.recvfrom(2048)
+        print(f"\tMessage Recieved from node : "+message.decode())
+    except:
+        pass
 
-    message, clientAddress = server.recvfrom(2048)
-    print(f"\tMessage Recieved from node: "+message.decode())
+def spool(amt):
+    """
+    For testing purposes, spin up a specifed number of slave nodes as threads on local machine
+    """
+    from slaveNode import main
 
+    for node in range(amt):
+        slaves = threading.Thread(target=main)
+        slaves.start()
 
 def main():
     serverPort = 12000
@@ -26,13 +37,16 @@ def main():
     info = []
     threads = []
 
-    amt = int(input("ammount of slaves: "))
-    slaves = threading.Thread(target = spool, args=[amt])
-    slaves.start()
+    amt = input("spool slaves? ")
+    if amt == "":
+        pass
+    else:
+        spool(int(amt))
 
     print("server starting...\n")
     run = input("run? ")
     timeout = input("server timeout: ")
+
     if timeout == "":
         server.settimeout(10.0)
     else:
