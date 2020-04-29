@@ -1,17 +1,12 @@
 class SMTP:
-    def __init__(self, sender, receiver, password):
+    def __init__(self, sender, receiver, password, payloadName=None, subject=None, contents=None):
         self.sender = sender
         self.receiver = receiver
         self.password = password
-        self.port = 465
-        self.payloadName = ""
-        self.subject = "S TEST"
-        self.contents = "C TEST"
-
-    def getPayload(self):
-        # todo add in filename from server
-        # return input("Enter FileName: ")
-        return "email_body.txt"
+        self.port = 587
+        self.payloadName = payloadName
+        self.subject = subject
+        self.contents = contents
 
     def sendEmail(self):
         import smtplib, ssl, pickle, mimetypes
@@ -22,15 +17,17 @@ class SMTP:
         message['To'] = self.receiver
         message['Subject'] = self.subject
         message.set_content(self.contents)
+        
+        try:
+            with open(self.payloadName, "rb") as att:
+                attachment = att.read()
+        except:
+            print(self.payloadName)
+            return False
 
-        aFile = self.getPayload()
+        message.add_attachment(attachment, maintype="text", subtype="plain", filename=self.payloadName)
 
-        with open(aFile, "rb") as att:
-            attachment = att.read()
-
-        message.add_attachment(attachment, maintype="text", subtype="plain", filename=aFile)
-
-        session = smtplib.SMTP("smtp.gmail.com", 587)
+        session = smtplib.SMTP("smtp.gmail.com", self.port)
         session.starttls()
         session.login(self.sender, self.password)
 
