@@ -9,49 +9,37 @@ class SMTP:
         self.contents = "C TEST"
 
     def getPayload(self):
-        #todo add in filename from server
-        #return input("Enter FileName: ")
+        # todo add in filename from server
+        # return input("Enter FileName: ")
         return "email_body.txt"
 
     def sendEmail(self):
-        import smtplib, ssl, pickle
-        from email.mime.multipart import MIMEMultipart
-        from email.mime.text import MIMEText
-        from email.mime.base import MIMEBase
-        from email import encoders
+        import smtplib, ssl, pickle, mimetypes
+        from email.message import EmailMessage
 
-        message = MIMEMultipart()
+        message = EmailMessage()
         message['From'] = self.sender
         message['To'] = self.receiver
         message['Subject'] = self.subject
+        message.set_content(self.contents)
 
-        message.attach(MIMEText(self.contents, 'plain'))
+        aFile = self.getPayload()
 
-        try:
-            attachedFile = open(self.getPayload(), 'rb')
-        except:
-            #Todo Add in send back to server error, reinput file
-            print("could not find file.. Try again.")
-            self.sendEmail()
+        with open(aFile, "rb") as att:
+            attachment = att.read()
 
-        payload = MIMEBase('application', 'octate-stream')
-        payload.set_payload((attachedFile).read())
-        encoders.encode_base64(payload)
+        message.add_attachment(attachment, maintype="text", subtype="plain", filename=aFile)
 
-        payload.add_header('Content-Decomposition', 'attachment', filename=self.payloadName)
-        message.attach(payload)
-
-        session = smtplib.SMTP('smtp.gmail.com', 587)
+        session = smtplib.SMTP("smtp.gmail.com", 587)
         session.starttls()
         session.login(self.sender, self.password)
 
-        text = message.as_string()
-        session.sendmail(self.sender, self.receiver, self.contents)
+        session.send_message(message, self.sender, self.receiver)
         session.quit()
-        
+
         return True
 
+
 if __name__ == "__main__":
-    import pickle
     smtp = SMTP(sender, receiver, password)
     SMTP.__module__ = "smtp"
