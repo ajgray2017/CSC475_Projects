@@ -55,18 +55,14 @@ def main():
     else:
         server.settimeout(float(timeout))
 
-    if run == "":
-        info = ["hellotest001smtp@gmail.com", "hellotest002smtp@gmail.com",
-                "csc475assignment", "email_body.txt", "Test", "Test"]
-    else:
-        info[0] = input("sender email: ")
-        info[1] = input("receiver email: ")
-        info[2] = input("sender password: ")
-        info[3] = input("file path: ")
-        if info[3] == "":
-            info[3] = None
-        info[4] = input("subject: ")
-        info[5] = input("body: ")
+    info[0] = input("sender email: ")
+    info[1] = input("receiver email: ")
+    info[2] = input("sender password: ")
+    info[3] = input("file path: ")
+    if info[3] == "":
+        info[3] = None
+    info[4] = input("subject: ")
+    info[5] = input("body: ")
 
     print('The server is ready to destroy your enemies and get you arrested for wire fraud')
 
